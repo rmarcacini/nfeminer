@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<!-- saved from url=(0044)http://kenedict.com/networks/worldcup14/vis/ , thanks Andre!-->
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF8" />
+    <title>
+      NFeMiner - Graph Analysis
+    </title>
+
+    <script
+      type="text/javascript"
+      src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
+
+    <script src="graph.js"></script>
+
+    <style type="text/css">
+body, html, #mynetwork {
+   width:100%;
+   padding:0;
+   height:100%;
+   margin:0; 
+}
+
+
+
+    </style>
+  </head>
+
+  <body>
+
+    <script type="text/javascript">
+      var network;
+      var allNodes;
+      var highlightActive = false;
+
+      var nodesDataset = new vis.DataSet(nodes); // these come from WorldCup2014.js
+      var edgesDataset = new vis.DataSet(edges); // these come from WorldCup2014.js
+
+  
+    </script>
+
+
+    <script type="text/javascript">
+      function draw() {
+        // create some nodes
+        var nodes = nodesDataset
+
+        // create some edges
+        var edges = edgesDataset
+        // create a network
+        var container = document.getElementById("mynetwork");
+        var data = {
+          nodes: nodes,
+          edges: edges,
+        };
+        var options = {
+          nodes: {
+            shape: "dot",
+            size: 16,
+          },
+          physics: {
+            forceAtlas2Based: {
+              gravitationalConstant: -26,
+              centralGravity: 0.005,
+              springLength: 230,
+              springConstant: 0.18,
+            },
+            maxVelocity: 146,
+            solver: "forceAtlas2Based",
+            timestep: 0.35,
+            stabilization: { iterations: 150 },
+          },
+        };
+        var network = new vis.Network(container, data, options);
+      }
+    </script>
+  </head>
+
+  <body onload="draw()">
+    <div id="mynetwork"></div>
+  </body>  
+</html>

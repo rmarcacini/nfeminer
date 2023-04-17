@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 import seaborn as sns
 import matplotlib.pyplot as plt
+import json
+import os
 
 def hist_kde(df_model, output_img='hist_kde.png', price_column = "Valor_unit_prod"):
   sns.histplot(data=df_model, x=price_column, kde=True)
@@ -9,11 +11,11 @@ def hist_kde(df_model, output_img='hist_kde.png', price_column = "Valor_unit_pro
   print(output_img,': OK')
 
 
-def graph(df_data, text_column, price_column, output_js='graph.js', neighbors=6):
+def graph(df_data, text_column, price_column, output='graph', neighbors=6):
 
-  neigh = NearestNeighbors(n_neighbors=6, metric='cosine')
+  neigh = NearestNeighbors(n_neighbors=neighbors, metric='cosine')
   neigh.fit(np.array(df_data[['umap_emb_x','umap_emb_y']]))
-  distances,instances  = neigh.kneighbors(np.array(df_data[['umap_emb_x','umap_emb_y']]))
+  _,instances  = neigh.kneighbors(np.array(df_data[['umap_emb_x','umap_emb_y']]))
 
   nodes = {}
   edges = []
@@ -29,34 +31,33 @@ def graph(df_data, text_column, price_column, output_js='graph.js', neighbors=6)
       price_bin = df_data.iloc[id]['price_bin']
 
       if id not in nodes:
-        node_desc = '''
-          {
-              id: '''+str(id)+''',
-              label: "'''+title+'''",
-              title: "NFe ID: '''+str(id)+'''",
-              value: '''+str(size)+''',
-              group: '''+str(int(price_bin))+''',
-              x: '''+str(x*100)+''',
-              y: '''+str(y*100)+''',
-          },
-          '''
+        node_desc = {
+          'id': int(id),
+          'label': title,
+          'title': f'NFe ID: {str(id)}',
+          'value': size, 
+          'group': int(price_bin),
+          'x': float(100*x),
+          'y': float(100*y)
+        }
         nodes[id] = node_desc
       
       if counter > 0:
-        edges.append('  { from: '+str(v[0])+', to: '+str(v[counter])+' },'+"\n")
+        edges.append({'from': int(v[0]), 'to': int(v[counter])})
       
       counter += 1
+  data = {'nodes': list(nodes.values()), 'edges': edges}
 
-  with open(output_js, 'w') as f:
-      f.write('var nodes = ['+"\n")  
-      for node in nodes:
-        f.write(nodes[node])
-      f.write('];'+"\n\n")
-
-      f.write('var edges = ['+"\n")
-      for edge in edges:
-        f.write(edge)
-      f.write('];'+"\n")
-  print(output_js,': OK')
+  json_file = os.path.join('nfeminer', 'util', f'{output}.json') 
+  with open(json_file, 'w') as f:
+    json.dump(data, f, indent=4)
+  print(json_file,': OK')
 
 
+  js_code = 'var nodes = ' + json.dumps(data['nodes'], indent=4) + ';\n'
+  js_code += 'var edges = ' + json.dumps(data['edges'], indent=4) + ';\n'
+
+  js_file = os.path.join('nfeminer', 'util', f'{output}.js')
+  with open(js_file, 'w') as f:
+    f.write(js_code)
+  print(js_file,': OK')

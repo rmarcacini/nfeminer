@@ -9,8 +9,8 @@ pip install elasticsearch==7.14.1
 pip install --upgrade gdown
 
 # files
-mkdir -p /content
-cd /content
+mkdir -p ./content
+cd ./content
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.10.0-linux-x86_64.tar.gz -q
 gdown --id 1oGIac8u21gIMOcpxZ3QGgMSkLkWfYSIc
 
@@ -19,8 +19,8 @@ tar -xzf elasticsearch-7.10.0-linux-x86_64.tar.gz
 chown -R daemon:daemon elasticsearch-7.10.0-linux-x86_64.tar.gz
 useradd elasticsearch
 chmod -R 777 elasticsearch-7.10.0
-echo "!#/bin/bash" > /content/run.sh
-echo "/content/elasticsearch-7.10.0/bin/elasticsearch &" >> /content/run.sh
+echo "!#/bin/bash" > run.sh
+echo "./content/elasticsearch-7.10.0/bin/elasticsearch &" >> run.sh
 chmod 777 run.sh
 
 # NFe Word Embeddings
